@@ -15,7 +15,7 @@ function browserCropBundle(): Plugin {
           lib: {
             entry: resolve(__dirname, 'src/addons/browserCrop.ts'),
             name: 'BrowserCrop',
-            fileName: 'browserCrop',
+            fileName: 'addons/browserCrop',
           },
         },
         plugins: [
