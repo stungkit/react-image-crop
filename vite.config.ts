@@ -1,7 +1,34 @@
 import { resolve } from 'path'
-import { defineConfig } from 'vite'
+import { build, defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
+
+function browserCropBundle(): Plugin {
+  return {
+    name: 'browser-crop-bundle',
+    apply: 'build',
+    async closeBundle() {
+      await build({
+        configFile: false,
+        build: {
+          emptyOutDir: false,
+          lib: {
+            entry: resolve(__dirname, 'src/addons/browserCrop.ts'),
+            name: 'BrowserCrop',
+            fileName: 'browserCrop',
+          },
+        },
+        plugins: [
+          dts({
+            staticImport: true,
+            insertTypesEntry: true,
+            bundleTypes: true,
+          }),
+        ],
+      })
+    },
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -41,7 +68,8 @@ export default defineConfig({
     dts({
       staticImport: true,
       insertTypesEntry: true,
-      rollupTypes: true,
+      bundleTypes: true,
     }),
+    browserCropBundle(),
   ],
 })
