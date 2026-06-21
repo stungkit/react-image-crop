@@ -208,8 +208,7 @@ The browser crop addon can render a completed crop to a canvas or return it as a
 
 ```tsx
 import { useRef, useState } from 'react'
-import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop'
-import { cropToCanvas, cropToImg } from 'react-image-crop/addons/browserCrop'
+import ReactCrop, { cropToCanvas, cropToImg, type Crop, type PixelCrop } from 'react-image-crop'
 
 function CropPreview({ src }: { src: string }) {
   const imgRef = useRef<HTMLImageElement>(null)
