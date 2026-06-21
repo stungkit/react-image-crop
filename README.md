@@ -204,7 +204,57 @@ Show the crop area as a circle. If your `aspect` is not `1` (a square) then the 
 
 ### How can I generate a crop preview in the browser?
 
-This isn't part of the library but there is an example over here [CodeSandbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o).
+The browser crop addon can render a completed crop to a canvas or return it as an image object URL. In the demo helpers, `cropToCanvas` is the same idea as `canvasPreview`, and `cropToImg` is the same idea as `imgPreview`.
+
+```tsx
+import { useRef, useState } from 'react'
+import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop'
+import { cropToCanvas, cropToImg } from 'react-image-crop/src/addons/browserCrop'
+
+function CropPreview({ src }: { src: string }) {
+  const imgRef = useRef<HTMLImageElement>(null)
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null)
+  const [crop, setCrop] = useState<Crop>()
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
+  const [previewSrc, setPreviewSrc] = useState('')
+
+  async function updatePreview(crop: PixelCrop) {
+    if (!imgRef.current || !previewCanvasRef.current) {
+      return
+    }
+
+    await cropToCanvas(imgRef.current, previewCanvasRef.current, crop)
+    setPreviewSrc(await cropToImg(imgRef.current, crop))
+  }
+
+  return (
+    <>
+      <ReactCrop
+        crop={crop}
+        onChange={(_, percentCrop) => setCrop(percentCrop)}
+        onComplete={c => {
+          setCompletedCrop(c)
+          void updatePreview(c)
+        }}
+      >
+        <img ref={imgRef} alt="Crop me" src={src} />
+      </ReactCrop>
+
+      {!!completedCrop && <canvas ref={previewCanvasRef} />}
+      {!!previewSrc && <img alt="Crop preview" src={previewSrc} />}
+    </>
+  )
+}
+```
+
+Both helpers also accept optional `scale` and `rotate` arguments:
+
+```ts
+await cropToCanvas(image, canvas, completedCrop, scale, rotate)
+const previewSrc = await cropToImg(image, completedCrop, scale, rotate)
+```
+
+See the [CodeSandbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o) for a more complete example.
 
 ### How to correct image EXIF orientation/rotation?
 
